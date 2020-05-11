@@ -2,9 +2,12 @@ const resolvers = {
   Query: {
     me() {
       return {
-        email: "jen.calvineo",
-        avatar: "jen.calvineo",
+        id: "1",
+        name: "Jenaro",
+        createdAt: new Date(),
+        updatedAt: new Date(),
         projects: [],
+        email: "jen.calvineo",
       };
     },
   },
