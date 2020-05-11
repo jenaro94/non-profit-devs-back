@@ -10,8 +10,29 @@ const typeDefs = gql`
     projects: [Project!]
   }
 
+  input SignupInput {
+    email: String!
+    name: String!
+    password: String!
+  }
+
+  input LoginInput {
+    email: String!
+    password: String!
+  }
+
+  type Token {
+    token: String!
+  }
+
   extend type Query {
-    me: User!
+    users: [User]!
+    user: User!
+  }
+
+  extend type Mutation {
+    signup(input: SignupInput): User
+    login(input: LoginInput): Token
   }
 `;
 
