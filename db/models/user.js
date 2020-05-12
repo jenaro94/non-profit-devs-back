@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }],
+    skills: {
+      type: [String],
+      required: true,
+    },
   },
   {
     timestamps: true,

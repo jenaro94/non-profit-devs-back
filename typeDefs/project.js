@@ -11,8 +11,31 @@ const typeDefs = gql`
     users: [User!]
   }
 
+  input CreateProjectInput {
+    name: String!
+    description: String!
+    contactEmail: String!
+  }
+
+  input UpdateProjectInput {
+    name: String
+    description: String
+    contactEmail: String
+  }
+
+  input AddUserInput {
+    user: ID!
+  }
+
   extend type Query {
-    allProjects: [Project!]!
+    projects: [Project!]
+    project(id: ID!): Project
+  }
+
+  extend type Mutation {
+    createProject(input: CreateProjectInput): Project
+    updateProject(id: ID!, input: UpdateProjectInput): Project
+    addUserToProject(id: ID!, input: AddUserInput): Project
   }
 `;
 
