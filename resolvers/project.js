@@ -1,5 +1,8 @@
+const { combineResolvers } = require("graphql-resolvers");
+
 const Project = require("../db/models/project");
 const User = require("../db/models/user");
+const { isAuthenticated } = require("./middleware");
 
 const resolvers = {
   Query: {
@@ -26,38 +29,44 @@ const resolvers = {
         throw err;
       }
     },
-    updateProject: async (_, { id, input }) => {
-      try {
-        const project = await Project.findOneAndUpdate(
-          { _id: id },
-          { ...input },
-          { new: true }
-        );
-        return project;
-      } catch (err) {
-        console.log(err);
-        throw err;
-      }
-    },
-    addUserToProject: async (_, { id, input }) => {
-      try {
-        const project = await User.findOne({ _id: id });
-        const user = await Project.findOne({ _id: input.user });
-        if (!user || !project) {
-          throw new Error(
-            `Project with id: ${id} or user with id: ${input.user} could not be found`
+    updateProject: combineResolvers(
+      isAuthenticated,
+      async (_, { id, input }) => {
+        try {
+          const project = await Project.findOneAndUpdate(
+            { _id: id },
+            { ...input },
+            { new: true }
           );
+          return project;
+        } catch (err) {
+          console.log(err);
+          throw err;
         }
-
-        user.projects.push(id);
-        project.users.push(input.user);
-        await user.save();
-        return await project.save();
-      } catch (err) {
-        console.log(err);
-        throw err;
       }
-    },
+    ),
+    addUserToProject: combineResolvers(
+      isAuthenticated,
+      async (_, { id, input }) => {
+        try {
+          const project = await User.findOne({ _id: id });
+          const user = await Project.findOne({ _id: input.user });
+          if (!user || !project) {
+            throw new Error(
+              `Project with id: ${id} or user with id: ${input.user} could not be found`
+            );
+          }
+
+          user.projects.push(id);
+          project.users.push(input.user);
+          await user.save();
+          return await project.save();
+        } catch (err) {
+          console.log(err);
+          throw err;
+        }
+      }
+    ),
   },
   Project: {
     users: async ({ users }) => {
