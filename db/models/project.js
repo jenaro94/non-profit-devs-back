@@ -15,6 +15,7 @@ const projectSchema = new mongoose.Schema(
       required: true,
     },
     users: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    status: String,
   },
   {
     timestamps: true,

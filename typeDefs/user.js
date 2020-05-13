@@ -35,6 +35,17 @@ const typeDefs = gql`
     project: ID!
   }
 
+  input UpdateUserInput {
+    name: String
+    email: String
+    skills: [String]
+  }
+
+  input ChangePasswordInput {
+    oldPassword: String!
+    newPassword: String!
+  }
+
   type Token {
     token: String!
   }
@@ -45,9 +56,13 @@ const typeDefs = gql`
   }
 
   extend type Mutation {
-    signup(input: SignupInput): User
-    login(input: LoginInput): Token
-    addProjectToUser(id: ID!, input: AddProjectInput): User
+    signup(input: SignupInput!): User!
+    login(input: LoginInput!): Token!
+    addProjectToUser(id: ID!, input: AddProjectInput!): User!
+    removeProjectFromUser(id: ID!, input: AddProjectInput!): User
+    updateUser(id: ID!, input: UpdateUserInput!): User!
+    changePassword(id: ID!, input: ChangePasswordInput!): User!
+    deleteUser(id: ID!): User
   }
 `;
 

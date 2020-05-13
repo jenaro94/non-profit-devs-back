@@ -67,6 +67,25 @@ const resolvers = {
         }
       }
     ),
+    removeUserFromProject: combineResolvers(
+      isAuthenticated,
+      async (_, { id, input }) => {
+        try {
+          await User.updateOne(
+            { _id: input.user },
+            { $pull: { projects: id } }
+          );
+          return await Project.findOneAndUpdate(
+            { _id: id },
+            { $pull: { users: input.user } },
+            { new: true }
+          );
+        } catch (err) {
+          console.log(err);
+          throw err;
+        }
+      }
+    ),
   },
   Project: {
     users: async ({ users }) => {

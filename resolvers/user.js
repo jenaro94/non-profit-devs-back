@@ -29,7 +29,7 @@ const resolvers = {
         const passw = new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/);
         if (!input.password.match(passw)) {
           throw new Error(
-            `Password must contain 1 uppercase letter, 1 lowercase letter, a number and be at least 8 characters long.`
+            `Password must contain 1 uppercase letter, 1 lowercase letter, a number and be between 8 and 20 characters long.`
           );
         }
 
@@ -82,6 +82,91 @@ const resolvers = {
           project.users.push(id);
           user.projects.push(input.project);
           await project.save();
+          return await user.save();
+        } catch (err) {
+          console.log(err);
+          throw err;
+        }
+      }
+    ),
+    removeProjectFromUser: combineResolvers(
+      isAuthenticated,
+      async (_, { id, input }) => {
+        try {
+          await Project.updateOne(
+            { _id: input.project },
+            { $pull: { users: id } }
+          );
+          return await User.findOneAndUpdate(
+            { _id: id },
+            { $pull: { projects: input.project } },
+            { new: true }
+          );
+        } catch (err) {
+          console.log(err);
+          throw err;
+        }
+      }
+    ),
+    updateUser: combineResolvers(isAuthenticated, async (_, { id, input }) => {
+      try {
+        const user = await User.findOne({ _id: id });
+        if (!user) {
+          throw new Error(`User with id $${id} could not be found`);
+        }
+
+        if (input.name) {
+          user.name = input.name;
+        }
+
+        if (input.email) {
+          user.email = input.email;
+        }
+
+        if (input.skills) {
+          user.skills = input.skills;
+        }
+
+        return await user.save();
+      } catch (err) {
+        console.log(err);
+        throw err;
+      }
+    }),
+    deleteUser: combineResolvers(isAuthenticated, async (_, { id }) => {
+      try {
+        return await User.findOneAndDelete({ _id: id });
+      } catch (err) {
+        console.log(err);
+        throw err;
+      }
+    }),
+    changePassword: combineResolvers(
+      isAuthenticated,
+      async (_, { id, input }) => {
+        try {
+          const user = await User.findOne({ _id: id });
+          if (!user) {
+            throw new Error(`User with id $${id} could not be found`);
+          }
+
+          const isPasswordValid = await bcrypt.compare(
+            input.oldPassword,
+            user.password
+          );
+          if (!isPasswordValid) {
+            throw new Error("Old password is incorrect.");
+          }
+
+          const passw = new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/);
+          if (!input.newPassword.match(passw)) {
+            throw new Error(
+              `Password must contain 1 uppercase letter, 1 lowercase letter, a number and be between 8 and 20 characters long.`
+            );
+          }
+
+          const hashedPassword = await bcrypt.hash(input.newPassword, 12);
+          user.password = hashedPassword;
           return await user.save();
         } catch (err) {
           console.log(err);
