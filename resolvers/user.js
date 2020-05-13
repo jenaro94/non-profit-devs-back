@@ -23,7 +23,14 @@ const resolvers = {
       try {
         const user = await User.findOne({ email: input.email });
         if (user) {
-          throw new Error("Email already in use");
+          throw new Error(`Email ${input.email} already in use`);
+        }
+
+        const passw = new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,20}$/);
+        if (!input.password.match(passw)) {
+          throw new Error(
+            `Password must contain 1 uppercase letter, 1 lowercase letter, a number and be at least 8 characters long.`
+          );
         }
 
         const hashedPassword = await bcrypt.hash(input.password, 12);
