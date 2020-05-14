@@ -23,16 +23,15 @@ const app = express();
 app.use(
   cors({
     origin: function (origin, callback) {
-      // console.log(`ORIGIN" ${origin}`);
-      // if (origin === undefined || allowedOrigins.indexOf(origin) !== -1) {
-      return callback(null, true);
-      // }
-      // return callback(
-      //   new Error(
-      //     `The CORS policy for this site does not allow access from the specified Origin.`
-      //   ),
-      //   false
-      // );
+      if (origin === undefined || allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      }
+      return callback(
+        new Error(
+          `The CORS policy for this site does not allow access from the specified Origin.`
+        ),
+        false
+      );
     },
   })
 );
