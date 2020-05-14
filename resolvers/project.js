@@ -1,4 +1,5 @@
 const { combineResolvers } = require("graphql-resolvers");
+const uniqueSlug = require("unique-slug");
 
 const Project = require("../db/models/project");
 const User = require("../db/models/user");
@@ -14,7 +15,10 @@ const resolvers = {
 
       return project;
     },
-    projects: async () => {
+    projects: async (_, { status }) => {
+      if (status) {
+        return await Project.find({ status });
+      }
       return await Project.find();
     },
   },
@@ -22,6 +26,7 @@ const resolvers = {
     createProject: async (_, { input }) => {
       try {
         const newProject = new Project({ ...input });
+        newProject.slug = uniqueSlug(input.name);
         const result = await newProject.save();
         return result;
       } catch (err) {

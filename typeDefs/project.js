@@ -17,6 +17,8 @@ const typeDefs = gql`
     updatedAt: Date!
     users: [User!]
     status: ProjectStatus!
+    slug: String!
+    repository: String!
   }
 
   input CreateProjectInput {
@@ -30,6 +32,7 @@ const typeDefs = gql`
     name: String
     description: String
     contactEmail: String
+    repository: String
     status: ProjectStatus
   }
 
@@ -38,7 +41,7 @@ const typeDefs = gql`
   }
 
   extend type Query {
-    projects: [Project!]
+    projects(status: ProjectStatus): [Project!]
     project(id: ID!): Project
   }
 

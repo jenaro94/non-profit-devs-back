@@ -16,6 +16,8 @@ const projectSchema = new mongoose.Schema(
     },
     users: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     status: String,
+    slug: String,
+    repository: String,
   },
   {
     timestamps: true,
