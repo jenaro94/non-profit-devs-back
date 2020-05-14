@@ -23,6 +23,7 @@ const app = express();
 app.use(
   cors({
     origin: function (origin, callback) {
+      console.log(`ORIGIN" ${origin}`);
       if (origin === undefined || allowedOrigins.indexOf(origin) !== -1) {
         return callback(null, true);
       }
