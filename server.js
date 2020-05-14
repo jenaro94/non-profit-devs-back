@@ -11,9 +11,30 @@ const { verifyUser } = require("./helpers/context");
 dotEnv.config();
 
 connection();
-
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:4000",
+  "http://localhost:4000/graphql",
+  "https://nonprofitdevs.com",
+  "https://www.nonprofitdevs.com",
+];
 const app = express();
-app.use(cors());
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (origin === undefined || allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      }
+      return callback(
+        new Error(
+          `The CORS policy for this site does not allow access from the specified Origin.`
+        ),
+        false
+      );
+    },
+  })
+);
 app.use(express.json());
 
 const server = new ApolloServer({
