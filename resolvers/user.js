@@ -61,7 +61,7 @@ const resolvers = {
         const token = jwt.sign({ email: user.email }, secret, {
           expiresIn: "1d",
         });
-        return { token };
+        return { token: { token }, user };
       } catch (err) {
         console.log(err);
         throw err;

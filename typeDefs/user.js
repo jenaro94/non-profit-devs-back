@@ -23,7 +23,7 @@ const typeDefs = gql`
     email: String!
     name: String!
     password: String!
-    skills: Skill!
+    skills: [Skill]!
   }
 
   input LoginInput {
@@ -50,6 +50,11 @@ const typeDefs = gql`
     token: String!
   }
 
+  type LoginResult {
+    token: Token!
+    user: User!
+  }
+
   extend type Query {
     users: [User]!
     user(id: ID!): User!
@@ -57,7 +62,7 @@ const typeDefs = gql`
 
   extend type Mutation {
     signup(input: SignupInput!): User!
-    login(input: LoginInput!): Token!
+    login(input: LoginInput!): LoginResult!
     addProjectToUser(id: ID!, input: AddProjectInput!): User!
     removeProjectFromUser(id: ID!, input: AddProjectInput!): User
     updateUser(id: ID!, input: UpdateUserInput!): User!

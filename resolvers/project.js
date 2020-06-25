@@ -54,8 +54,8 @@ const resolvers = {
       isAuthenticated,
       async (_, { id, input }) => {
         try {
-          const project = await User.findOne({ _id: id });
-          const user = await Project.findOne({ _id: input.user });
+          const project = await Project.findOne({ _id: id });
+          const user = await User.findOne({ _id: input.user });
           if (!user || !project) {
             throw new Error(
               `Project with id: ${id} or user with id: ${input.user} could not be found`

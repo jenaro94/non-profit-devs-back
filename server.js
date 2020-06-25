@@ -2,12 +2,14 @@ const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
 const cors = require("cors");
 const dotEnv = require("dotenv");
+const os = require('os');
+
 const resolvers = require("./resolvers");
 const typeDefs = require("./typeDefs");
-
 const { connection } = require("./db/util");
 const { verifyUser } = require("./helpers/context");
 
+const ifaces = os.networkInterfaces();
 dotEnv.config();
 
 connection();
@@ -15,6 +17,8 @@ const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:4000",
   "http://localhost:4000/graphql",
+  "http://100.115.92.200:4000",
+  "http://100.115.92.200:3000",
   "https://nonprofitdevs.com",
   "https://www.nonprofitdevs.com",
 ];
@@ -28,7 +32,7 @@ app.use(
       }
       return callback(
         new Error(
-          `The CORS policy for this site does not allow access from the specified Origin.`
+          `The CORS policy for this site does not allow access from the origin ${origin}.`
         ),
         false
       );
@@ -55,11 +59,29 @@ const server = new ApolloServer({
   }),
 });
 
+let IPADDR;
+Object.keys(ifaces).forEach(function (ifname) {
+  let alias = 0;
+
+  ifaces[ifname].forEach(function (iface) {
+    if ('IPv4' !== iface.family || iface.internal !== false) {
+      return;
+    }
+
+    if (alias >= 1) {
+      IPADDR = iface.address;
+    } else {
+      IPADDR = iface.address;
+    }
+    ++alias;
+  });
+});
+
 server.applyMiddleware({ app, path: "/graphql" });
 const PORT = process.env.PORT || 4000;
 const httpServer = app.listen(PORT, () => {
-  console.log(`🚀 Api running on port: ${PORT}`);
-  console.log(`🚀 GraphQL endpoint: ${server.graphqlPath}`);
+  console.log(`🚀 Api running on port: ${IPADDR}:${PORT}`);
+  console.log(`🚀 GraphQL endpoint: ${IPADDR}:${PORT}${server.graphqlPath}`);
 });
 
 server.installSubscriptionHandlers(httpServer);
